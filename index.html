@@ -1,359 +1,290 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise Interativa de Cenários: Acordo vs. Litígio</title>
+    <title>Website - Comparativo TRF3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Neutral Stone -->
-    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard to guide the user through a persuasive narrative. It starts with the core problem ('Custo da Inércia'), then provides an interactive tool (toggle and dynamic chart) to explore the proposed 'Projeto-Piloto' solution under two different calculation scenarios. This allows for direct comparison and user-driven discovery of the financial benefits. The structure concludes with supporting qualitative arguments (legal and institutional) and a clear call to action. This thematic, interactive flow is more engaging and persuasive than a linear slide presentation, focusing user attention on the key decision points. -->
-    <!-- Visualization & Content Choices: 1. Key Metrics (e.g., Custo de Oportunidade) -> Goal: Inform/Hook -> Viz: Large KPI Cards -> Interaction: Static -> Justification: High-impact, immediate communication of the problem. -> Method: HTML/Tailwind. 2. Scenario Comparison (Deflação vs. Correção) -> Goal: Compare/Explore -> Viz: Interactive Bar Chart + Dynamic Tables/Text -> Interaction: User-controlled toggle switches all related data on the page. -> Justification: Allows direct, visual comparison of financial outcomes, making the 'Ganho para a União' tangible and easy to understand. The chart provides a macro view, while the tables offer detailed data. -> Library: Chart.js (Canvas). 3. Supporting Arguments (Legal/Institutional) -> Goal: Inform/Justify -> Viz: Two-column text blocks with icons -> Interaction: Static -> Justification: Presents qualitative information in a clean, scannable format that complements the quantitative data. -> Method: HTML/Tailwind. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
+            background-color: #f0f2f5;
+            color: #1f2937;
         }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 400px;
-            max-height: 50vh;
-        }
-        .kpi-card {
+        .card {
             background-color: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            transform: translateY(0);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .kpi-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        .btn-active {
-            background-color: #1e40af; /* blue-800 */
-            color: white;
+        .highlight {
+            color: #4f46e5;
+            font-weight: 600;
         }
-        .btn-inactive {
-            background-color: #e5e7eb; /* gray-200 */
-            color: #374151; /* gray-700 */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 9999px;
         }
-        .table-responsive {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        .badge-red {
+            background-color: #fee2e2;
+            color: #b91c1c;
         }
-        .table-responsive table {
-            width: 100%;
+        .badge-green {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+         .badge-blue {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+        .nav-link {
+            @apply text-gray-600 hover:text-indigo-600 transition duration-300 font-medium;
+        }
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-gray-50">
 
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center">Análise Estratégica de Cenários para a União</h1>
-            <p class="text-center text-gray-600 mt-1">Proposta de Acordo vs. Continuidade do Litígio</p>
-        </div>
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Análise Comparativa TRF-3</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#sumario" class="nav-link">Sumário</a>
+                <a href="#caso1" class="nav-link">Caso 1: Bezerra de Menezes</a>
+                <a href="#caso2" class="nav-link">Caso 2: Mahatma Gandhi</a>
+                <a href="#conclusoes" class="nav-link">Conclusões</a>
+            </div>
+        </nav>
     </header>
 
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-
-        <section id="custo-oportunidade" class="mb-12">
-            <h2 class="text-2xl font-bold text-center mb-2">Análise de Custo de Oportunidade</h2>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">A análise de casos já finalizados demonstra um custo de oportunidade relevante. A ausência de um acordo resultou em pagamentos de aproximadamente 643 milhões para 7 hospitais que poderiam ter sido reduzidos pelos critérios do acordo, gerando uma economia para os cofres públicos.</p>
-            <div class="flex justify-center">
-                <div class="kpi-card text-center">
-                    <p class="text-lg font-medium text-gray-500">Economia Não Realizada</p>
-                    <p class="text-4xl sm:text-5xl font-bold text-red-600 mt-2">R$ 192,85 MM</p>
-                    <p class="text-sm text-gray-500 mt-2">Em 7 casos já pagos</p>
+    <main class="container mx-auto p-6 md:p-8 space-y-12">
+        <!-- Seção 1: Título -->
+        <section id="inicio" class="fade-in-section">
+            <div class="card text-center py-16">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">TRF-3 – Comparativo de Propostas</h1>
+                <p class="text-2xl md:text-3xl text-indigo-600 font-semibold mb-6">(União vs. 42,4 IGPM)</p>
+                <p class="text-lg text-gray-500 max-w-2xl mx-auto">Uma análise comparativa aprofundada para suportar a tomada de decisão estratégica.</p>
+                <div class="mt-8 text-sm text-gray-400">
+                    <i class="fas fa-calendar-alt mr-2"></i>Data da Análise: 02/09/2025
                 </div>
             </div>
         </section>
 
-        <hr class="my-12 border-gray-200">
-
-        <section id="projeto-piloto" class="mb-12">
-            <h2 class="text-2xl font-bold text-center mb-2">Proposta de Projeto-Piloto</h2>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">Propõe-se uma abordagem faseada com 8 casos maduros. A interatividade abaixo permite analisar os dois cenários de cálculo para o acordo.</p>
-            
-            <div class="flex justify-center mb-8">
-                <div class="inline-flex rounded-md shadow-sm" role="group">
-                    <button type="button" id="btn-deflacao" class="px-6 py-3 text-sm font-medium rounded-l-lg transition-colors duration-200">
-                        Cenário 1: Deflação
-                    </button>
-                    <button type="button" id="btn-correcao" class="px-6 py-3 text-sm font-medium rounded-r-lg transition-colors duration-200">
-                        Cenário 2: Correção
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="kpi-card">
-                    <p class="text-lg font-medium text-gray-500">Economia Potencial (Projeto-Piloto)</p>
-                    <p id="economia-total" class="text-4xl font-bold text-green-600 mt-2"></p>
-                    <p id="cenario-desc" class="text-sm text-gray-500 mt-2"></p>
-                </div>
-                 <div class="kpi-card">
-                    <p class="text-lg font-medium text-gray-500">Ganho da União com Acordo</p>
-                    <p id="ganho-financeiro" class="text-4xl font-bold text-blue-700 mt-2"></p>
-                    <p class="text-sm text-gray-500 mt-2">Comparado ao custo de postergação do litígio</p>
-                </div>
-            </div>
-
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-semibold mb-4 text-center">Detalhamento dos Casos do Projeto-Piloto</h3>
-                <div id="table-container" class="table-responsive">
-                </div>
-                <p id="table-footnote" class="text-xs text-gray-500 mt-4"></p>
-            </div>
-        </section>
-
-        <hr class="my-12 border-gray-200">
-
-        <section id="analise-financeira" class="mb-12">
-            <h2 class="text-2xl font-bold text-center mb-2">Análise Financeira Comparativa</h2>
-            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">O gráfico compara o valor presente do pagamento via litígio com o valor do acordo no cenário selecionado, evidenciando o ganho financeiro para a União.</p>
-            <div class="bg-white p-4 sm:p-6 rounded-lg shadow-md">
-                <div class="chart-container">
-                    <canvas id="financialChart"></canvas>
+        <!-- Seção 2: Objetivo e Sumário -->
+        <section id="sumario" class="fade-in-section">
+            <div class="card">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-200 pb-3">Objetivo & Sumário Executivo</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-3 flex items-center"><i class="fas fa-bullseye mr-3"></i>Objetivo</h3>
+                        <p class="text-gray-600 leading-relaxed">Demonstrar, de forma objetiva, a diferença entre a proposta da União e a contraproposta (42,4 corrigido pelo IGPM anual).</p>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-indigo-700 mb-3 flex items-center"><i class="fas fa-file-alt mr-3"></i>Sumário</h3>
+                        <ul class="space-y-3 text-gray-600 list-disc list-inside">
+                            <li>Proposta da União <span class="font-semibold text-red-600">significativamente abaixo</span> dos parâmetros buscados.</li>
+                            <li><span class="highlight">Associação Bezerra de Menezes:</span> Deságio da União de 75% vs. 19% da contraproposta, em comparação com o valor do hospital.</li>
+                            <li><span class="highlight">Hospital Mahatma Gandhi:</span> Deságio da União de 84% vs. 33% da contraproposta, em comparação com o valor do hospital.</li>
+                             <li>Contraproposta alinha o pagamento à base processual e <span class="font-semibold text-green-700">reduz o deságio</span>.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
-        
-        <hr class="my-12 border-gray-200">
 
-        <section id="fundamentacao" class="mb-12">
-             <h2 class="text-2xl font-bold text-center mb-8">Fundamentação Adicional</h2>
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 flex items-center">
-                        <span class="text-2xl mr-3">⚖️</span> Análise do Cenário Jurídico
-                    </h3>
-                    <ul class="space-y-3 text-gray-700">
-                        <li><strong class="font-semibold">Jurisprudência Consolidada:</strong> O entendimento dos TRFs tem se mostrado majoritariamente desfavorável à tese da União.</li>
-                        <li><strong class="font-semibold">Risco de Sucumbência:</strong> A manutenção dos litígios acarreta o risco de condenações acessórias, como o pagamento de honorários.</li>
-                        <li><strong class="font-semibold">Baixa Probabilidade de Êxito:</strong> O histórico de julgados indica uma baixa probabilidade de reversão da jurisprudência atual.</li>
-                    </ul>
+        <!-- Seção 3: Associação Assistencial Adolpho Bezerra de Menezes -->
+        <section id="caso1" class="fade-in-section">
+            <div class="card">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Caso 1: Associação Assistencial Adolpho Bezerra de Menezes</h2>
+                 <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="h-96">
+                        <canvas id="chartMenezes"></canvas>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="font-semibold text-gray-700">Valor no processo</p>
+                            <p class="text-2xl font-bold text-gray-900">R$ 217.580.179,20</p>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-lg">
+                            <p class="font-semibold text-red-800">Proposta União <span class="badge badge-red">Deságio 75%</span></p>
+                            <p class="text-2xl font-bold text-red-900">R$ 53.456.202,30</p>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <p class="font-semibold text-green-800">Contraproposta 42,4 IGPM <span class="badge badge-green">Deságio 19%</span></p>
+                            <p class="text-2xl font-bold text-green-900">R$ 176.066.212,90</p>
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-lg mt-4">
+                            <p class="font-semibold text-indigo-800">Δ Diferença (Contraproposta vs. União)</p>
+                            <p class="text-2xl font-bold text-indigo-900">+ R$ 122.610.010,60</p>
+                        </div>
+                    </div>
                 </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold mb-4 flex items-center">
-                        <span class="text-2xl mr-3">🤝</span> Alinhamento Institucional
-                    </h3>
-                    <ul class="space-y-3 text-gray-700">
-                        <li><strong class="font-semibold">Política da AGU:</strong> A proposta é aderente à política de conciliação e resolução eficiente de conflitos da instituição.</li>
-                        <li><strong class="font-semibold">Maior Previsibilidade Orçamentária:</strong> Confere maior previsibilidade ao fluxo de precatórios, diminuindo riscos fiscais. Possibilidade de parcelamento, desde que reduzido o deságio.</li>
-                        <li><strong class="font-semibold">Otimização de Recursos:</strong> A resolução consensual permite que a AGU aloque seus recursos em teses de maior impacto estratégico.</li>
-                    </ul>
-                </div>
-             </div>
+            </div>
         </section>
 
+        <!-- Seção 4: Hospital Psiquiátrico Espírita Mahatma Gandhi -->
+        <section id="caso2" class="fade-in-section">
+            <div class="card">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Caso 2: Hospital Psiquiátrico Espírita Mahatma Gandhi</h2>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="h-96">
+                       <canvas id="chartGandhi"></canvas>
+                    </div>
+                     <div class="space-y-3">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <p class="font-semibold text-gray-700">Valor no processo</p>
+                            <p class="text-2xl font-bold text-gray-900">R$ 114.257.016,43</p>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-lg">
+                            <p class="font-semibold text-red-800">Proposta União <span class="badge badge-red">Deságio 84%</span></p>
+                            <p class="text-2xl font-bold text-red-900">R$ 18.478.491,10</p>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded-lg">
+                            <p class="font-semibold text-green-800">Contraproposta 42,4 IGPM <span class="badge badge-green">Deságio 33%</span></p>
+                            <p class="text-2xl font-bold text-green-900">R$ 76.306.825,80</p>
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-lg mt-4">
+                            <p class="font-semibold text-indigo-800">Δ Diferença (Contraproposta vs. União)</p>
+                            <p class="text-2xl font-bold text-indigo-900">+ R$ 57.828.334,70</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção 5: Conclusões -->
+        <section id="conclusoes" class="fade-in-section">
+            <div class="card">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-indigo-200 pb-3 flex items-center"><i class="fas fa-lightbulb mr-3"></i>Conclusões Objetivas</h2>
+                <div class="space-y-6 text-lg text-gray-700">
+                    <div class="p-6 bg-gray-50 rounded-lg flex items-start">
+                        <i class="fas fa-exclamation-triangle text-2xl text-red-500 mr-4 mt-1"></i>
+                        <p>Ambas as frentes mostram <span class="font-semibold">discrepância relevante</span> entre a proposta da União e a referência processual.</p>
+                    </div>
+                     <div class="p-6 bg-blue-50 rounded-lg flex items-start">
+                        <i class="fas fa-chart-line text-2xl text-blue-500 mr-4 mt-1"></i>
+                        <p><span class="highlight">Associação Bezerra de Menezes:</span> a contraproposta captura <span class="badge badge-blue">80.9%</span> da base (vs. 24.6% da União), reduzindo o deságio de 75% para 19%.</p>
+                    </div>
+                     <div class="p-6 bg-blue-50 rounded-lg flex items-start">
+                        <i class="fas fa-chart-pie text-2xl text-blue-500 mr-4 mt-1"></i>
+                        <p><span class="highlight">Hospital Mahatma Gandhi:</span> a contraproposta captura <span class="badge badge-blue">66.8%</span> da base (vs. 16.2% da União), reduzindo o deságio de 84% para <span class="font-semibold">33%</span>.</p>
+                    </div>
+                    <div class="p-6 bg-green-50 rounded-lg flex items-start">
+                        <i class="fas fa-check-circle text-2xl text-green-500 mr-4 mt-1"></i>
+                        <p>Material <span class="font-semibold">pronto para suporte</span> em reuniões com a União, com dados atualizados de fevereiro de 2025.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
-
-    <footer class="bg-gray-800 text-white">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-            <h2 class="text-2xl font-bold mb-4">Síntese da Análise: A Decisão Estratégica</h2>
-            <p class="max-w-3xl mx-auto text-gray-300 mb-6">A análise dos cenários indica que a opção pelo acordo apresenta vantagens quantificáveis, representando a escolha de maior eficiência econômica e jurídica para a União.</p>
-            <div class="inline-block bg-blue-800 rounded-lg px-6 py-3">
-                <p class="font-semibold">Acordo: Economia, Segurança e Eficiência.</p>
-            </div>
+    
+    <!-- Footer -->
+    <footer class="bg-white mt-12">
+        <div class="container mx-auto px-6 py-4 text-center text-gray-500">
+            &copy; 2025 Análise Comparativa. Todos os direitos reservados.
         </div>
     </footer>
 
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const data = {
-                deflacao: {
-                    economiaTotal: 'R$ 530,8 MM',
-                    ganhoFinanceiro: 'R$ 215,82 MM',
-                    cenarioDesc: 'Cenário baseado na deflação do valor de R$ 93,51.',
-                    footnote: '* Deflaciona-se o valor de R$ 93,51 mês a mês pelos índices do IPCA-E definidos pelo Manual de Cálculo do CJF.',
-                    chartValue: 1.35,
-                    tableData: [
-                        { caso: 'Inst. Neuropsiquiátrico de Campina Grande', executado: '159,15', acordo: '88,44', economia: '70,71' },
-                        { caso: 'Hospital Psiquiátrico Vera Cruz', executado: '568,48', acordo: '425,21', economia: '143,27' },
-                        { caso: 'Clínica Psiquiátrica de Caruaru', executado: '74,58', acordo: '66,24', economia: '8,33' },
-                        { caso: 'SER - Casa de Saúde Santa Mônica', executado: '147,73', acordo: '107,86', economia: '39,87' },
-                        { caso: 'SER - Sanatório da Bahia', executado: '135,15', acordo: '123,22', economia: '11,93' },
-                        { caso: 'Clínica de Repouso Santa Isabel', executado: '536,07', acordo: '353,99', economia: '182,07' },
-                        { caso: 'Casa de Saúde Paulo Menicucci', executado: '123,24', acordo: '94,42', economia: '28,82' },
-                        { caso: 'Casa de Saúde de Natal', executado: '140,98', acordo: '95,21', economia: '45,77' }
-                    ],
-                    tableTotal: { executado: '1,89 BI', acordo: '1,35 BI', economia: '530,8 MM' }
-                },
-                correcao: {
-                    economiaTotal: 'R$ 658,2 MM',
-                    ganhoFinanceiro: 'R$ 343,21 MM',
-                    cenarioDesc: 'Cenário baseado na correção do valor histórico de R$ 42,40.',
-                    footnote: '¹ Critério apresentado em juízo na 1ª Região.',
-                    chartValue: 1.23,
-                    tableData: [
-                        { caso: 'Inst. Neuropsiquiátrico de Campina Grande', executado: '159,15', acordo: '81,28', economia: '77,87' },
-                        { caso: 'Hospital Psiquiátrico Vera Cruz', executado: '568,48', acordo: '393,79', economia: '174,69' },
-                        { caso: 'Clínica Psiquiátrica de Caruaru', executado: '74,58', acordo: '61,01', economia: '13,57' },
-                        { caso: 'SER - Casa de Saúde Santa Mônica', executado: '147,73', acordo: '85,72', economia: '62,01' },
-                        { caso: 'SER - Sanatório da Bahia', executado: '135,15', acordo: '108,62', economia: '26,53' },
-                        { caso: 'Clínica de Repouso Santa Isabel', executado: '536,07', acordo: '327,96', economia: '208,11' },
-                        { caso: 'Casa de Saúde Paulo Menicucci', executado: '123,24', acordo: '84,34', economia: '38,9' },
-                        { caso: 'Casa de Saúde de Natal', executado: '140,98', acordo: '84,49', economia: '56,49' }
-                    ],
-                    tableTotal: { executado: '1,89 BI', acordo: '1,23 BI', economia: '658,2 MM' }
-                }
-            };
+        document.addEventListener('DOMContentLoaded', () => {
+            // Funções dos Gráficos
+            const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-            const btnDeflacao = document.getElementById('btn-deflacao');
-            const btnCorrecao = document.getElementById('btn-correcao');
-            const economiaTotalEl = document.getElementById('economia-total');
-            const ganhoFinanceiroEl = document.getElementById('ganho-financeiro');
-            const cenarioDescEl = document.getElementById('cenario-desc');
-            const tableContainerEl = document.getElementById('table-container');
-            const tableFootnoteEl = document.getElementById('table-footnote');
-
-            let currentScenario = 'deflacao';
-
-            const ctx = document.getElementById('financialChart').getContext('2d');
-            const financialChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Custo do Litígio (VP)', 'Custo do Acordo'],
-                    datasets: [{
-                        label: 'Valor em R$ Bilhões',
-                        data: [1.57, data.deflacao.chartValue],
-                        backgroundColor: [
-                            'rgba(220, 38, 38, 0.7)', // red-600
-                            'rgba(29, 78, 216, 0.7)' // blue-700
-                        ],
-                        borderColor: [
-                            'rgba(220, 38, 38, 1)',
-                            'rgba(29, 78, 216, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Valor em R$ Bilhões'
-                            }
-                        }
+            function createChartMenezes() {
+                const ctx = document.getElementById('chartMenezes').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Valor no Processo', 'Proposta União', 'Contraproposta'],
+                        datasets: [{
+                            label: 'Valores em R$',
+                            data: [217580179.20, 53456202.30, 176066212.90],
+                            backgroundColor: ['#6366f1', '#ef4444', '#22c55e'],
+                            borderColor: ['#4f46e5', '#dc2626', '#16a34a'],
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            display: false
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => formatCurrency(c.raw) } }
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.x !== null) {
-                                        label += new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(context.parsed.x * 1000000000).replace('R$', 'R$ ').replace(',00', ' Bi');
-                                    }
-                                    return label;
-                                }
-                            }
-                        }
+                        scales: { y: { beginAtZero: true, ticks: { callback: (v) => 'R$ ' + (v / 1000000) + 'M' } } }
                     }
-                }
-            });
-
-            function createTable(tableData, tableTotal) {
-                let tableHTML = `
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Caso</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Executado (R$ MM)</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Acordo (R$ MM)</th>
-                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Economia (R$ MM)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
-                
-                tableData.forEach(row => {
-                    tableHTML += `
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${row.caso}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${row.executado}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${row.acordo}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600 text-right">${row.economia}</td>
-                        </tr>`;
                 });
-
-                tableHTML += `
-                        </tbody>
-                        <tfoot class="bg-gray-100">
-                            <tr>
-                                <th scope="row" class="px-6 py-3 text-left text-sm font-bold text-gray-900">TOTAL</th>
-                                <td class="px-6 py-3 text-right text-sm font-bold text-gray-900">${tableTotal.executado}</td>
-                                <td class="px-6 py-3 text-right text-sm font-bold text-gray-900">${tableTotal.acordo}</td>
-                                <td class="px-6 py-3 text-right text-sm font-bold text-green-700">${tableTotal.economia}</td>
-                            </tr>
-                        </tfoot>
-                    </table>`;
-                return tableHTML;
             }
 
-            function updateView(scenario) {
-                const scenarioData = data[scenario];
-                
-                economiaTotalEl.textContent = scenarioData.economiaTotal;
-                ganhoFinanceiroEl.textContent = scenarioData.ganhoFinanceiro;
-                cenarioDescEl.textContent = scenarioData.cenarioDesc;
-                tableFootnoteEl.textContent = scenarioData.footnote;
-                
-                tableContainerEl.innerHTML = createTable(scenarioData.tableData, scenarioData.tableTotal);
-
-                financialChart.data.datasets[0].data[1] = scenarioData.chartValue;
-                financialChart.update();
-
-                if (scenario === 'deflacao') {
-                    btnDeflacao.classList.remove('btn-inactive');
-                    btnDeflacao.classList.add('btn-active');
-                    btnCorrecao.classList.remove('btn-active');
-                    btnCorrecao.classList.add('btn-inactive');
-                } else {
-                    btnCorrecao.classList.remove('btn-inactive');
-                    btnCorrecao.classList.add('btn-active');
-                    btnDeflacao.classList.remove('btn-active');
-                    btnDeflacao.classList.add('btn-inactive');
-                }
+            function createChartGandhi() {
+                const ctx = document.getElementById('chartGandhi').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Valor no Processo', 'Proposta União', 'Contraproposta'],
+                        datasets: [{
+                            label: 'Valores em R$',
+                            data: [114257016.43, 18478491.10, 76306825.80],
+                            backgroundColor: ['#6366f1', '#ef4444', '#22c55e'],
+                            borderColor: ['#4f46e5', '#dc2626', '#16a34a'],
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => formatCurrency(c.raw) } }
+                        },
+                        scales: { y: { beginAtZero: true, ticks: { callback: (v) => 'R$ ' + (v / 1000000) + 'M' } } }
+                    }
+                });
             }
+            
+            createChartMenezes();
+            createChartGandhi();
 
-            btnDeflacao.addEventListener('click', () => {
-                if (currentScenario !== 'deflacao') {
-                    currentScenario = 'deflacao';
-                    updateView(currentScenario);
-                }
+            // Animação de scroll
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
             });
-
-            btnCorrecao.addEventListener('click', () => {
-                if (currentScenario !== 'correcao') {
-                    currentScenario = 'correcao';
-                    updateView(currentScenario);
-                }
-            });
-
-            updateView(currentScenario);
         });
     </script>
 </body>
 </html>
+
+
